@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Học Tiếng Nhật cùng Rem - Bài 1 (V13 - Aaron Control)</title>
+    <title>Học Tiếng Nhật cùng Rem - Bài 1 (V13 Optimized)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -186,10 +186,9 @@
                 <div id="rem-avatar-container" class="rem-avatar-container w-16 h-16 rounded-full overflow-hidden border-4 border-white rem-glow bg-blue-50 flex-shrink-0 group" onclick="document.getElementById('avatar-upload').click()" title="Chạm để đổi ảnh">
                     <!-- Default Rem Image -->
                     <img id="rem-avatar-img"
-                         src="../download.jpg"
+                         src="https://i.pinimg.com/736x/8f/c3/7b/8fc37b74b608a622588fbaa361485f32.jpg"
                          alt="Rem"
                          class="w-full h-full object-cover">
-
                     
                     <!-- Overlay Icon -->
                     <div class="upload-overlay absolute inset-0 bg-black/30 flex items-center justify-center">
@@ -366,7 +365,7 @@
             </div>
         </div>
 
-        <!-- 3. WRITE MODE -->
+        <!-- 3. WRITE MODE (OPTIMIZED) -->
         <div id="view-write" class="view-section hidden fade-in">
             <div class="max-w-xl mx-auto mt-4">
                 <div class="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100 text-center relative">
@@ -649,7 +648,6 @@
             }
         }
 
-        // FIXED: Extra Soft Volume (0.25)
         function playRemVoice(text) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -658,7 +656,7 @@
                 const voices = window.speechSynthesis.getVoices();
                 let jaVoice = voices.find(v => v.name.includes("Google") && v.lang.includes("ja"));
                 if (!jaVoice) {
-                     jaVoice = voices.find(v => v.lang === 'ja-JP' || v.lang === 'ja_JP');
+                      jaVoice = voices.find(v => v.lang === 'ja-JP' || v.lang === 'ja_JP');
                 }
                 
                 if (jaVoice) utterance.voice = jaVoice;
@@ -736,25 +734,13 @@
         }
         
         function triggerRemTalk() {
-            // Manual trigger works even if disabled? No, let's respect the toggle.
-            // If user wants to force talk, they should enable it first.
-            // OR we can allow manual override. Let's allow manual override but keep toggle off.
-            // Wait, previous request implied toggle controls "chat bot".
-            // Let's make manual trigger FORCE a message even if off, but keep auto-triggers off.
-            
-            const categories = ['welcome', 'correct', 'finish', 'idle'];
-            const randomCat = categories[Math.floor(Math.random() * categories.length)];
-            
-            // Allow one-time override logic
             if (!isRemActive) {
-                // If off, just show bubble briefly without changing global state?
-                // Actually safer to require ON.
-                // Let's check state.
                 const btn = document.getElementById('btn-toggle-chat');
                 btn.click(); // Auto turn on if clicked manually
                 return;
             }
-            
+            const categories = ['welcome', 'correct', 'finish', 'idle'];
+            const randomCat = categories[Math.floor(Math.random() * categories.length)];
             speakRem(randomCat);
         }
 
@@ -977,7 +963,7 @@
             if(currentQuizItem) playAudio(currentQuizItem.japanese);
         }
 
-        // --- WRITE LOGIC ---
+        // --- WRITE LOGIC (OPTIMIZED) ---
         function setWriteDirection(val) {
             writeDirection = val;
             initWrite();
@@ -1050,36 +1036,109 @@
             const h = document.getElementById('write-hint');
             h.style.opacity = h.style.opacity === '0' ? '1' : '0';
         }
+        
+        // --- HELPER FOR FLEXIBLE GRADING ---
+        function removeVietnameseTones(str) {
+            str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g,"a"); 
+            str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g,"e"); 
+            str = str.replace(/ì|í|ị|ỉ|ĩ/g,"i"); 
+            str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g,"o"); 
+            str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g,"u"); 
+            str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g,"y"); 
+            str = str.replace(/đ/g,"d");
+            // Normalize for composite chars
+            str = str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            return str;
+        }
+
+        function getPossibleAnswers(text) {
+            const normalized = text.toLowerCase();
+            let answers = new Set();
+            
+            // 1. Split by delimiters / , ;
+            const parts = normalized.split(/[\/,;]+/).map(s => s.trim()).filter(s => s);
+            
+            parts.forEach(part => {
+                answers.add(part); // Add full part "tên (lịch sự)"
+                
+                // 2. Handle Parentheses (abc) or （abc）
+                if (part.match(/[（(].*?[)）]/)) {
+                    // Remove content inside parens: "tên (lịch sự)" -> "tên"
+                    let clean = part.replace(/[（(].*?[)）]/g, '').trim();
+                    if (clean) answers.add(clean);
+                    
+                    // Keep content but remove parens symbols: "tên (lịch sự)" -> "tên lịch sự"
+                    let noParens = part.replace(/[（()）]/g, ' ').replace(/\s+/g, ' ').trim();
+                    if (noParens) answers.add(noParens);
+                }
+                
+                // 3. Handle Tilde ~
+                if (part.includes('~') || part.includes('～')) {
+                    let noTilde = part.replace(/[~～]/g, '').trim();
+                    if (noTilde) answers.add(noTilde);
+                }
+            });
+            return Array.from(answers);
+        }
+
         function checkWriteAnswer() {
             if(writeState !== 'waiting') {
                 writeIndex++;
                 renderWrite();
                 return;
             }
-            const input = document.getElementById('write-input').value.trim();
-            if(!input) return;
+            const rawInput = document.getElementById('write-input').value.trim();
+            if(!rawInput) return;
+            
             const item = writeList[writeIndex];
             const targetIsJa = document.getElementById('view-write').dataset.targetIsJa === 'true';
             let correct = false;
 
             if (targetIsJa) {
+                // VI -> JA
                 if(writeInputType === 'romaji') {
+                    // Normalize Input
                     const normalize = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
-                    const cleanInput = normalize(input);
-                    const target1 = normalize(item.romaji.normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
-                    const target2 = normalize(item.romaji.replace(/ā/g, 'aa').replace(/ō/g, 'oo').replace(/ū/g, 'uu'));
-                    const target3 = normalize(item.romaji.replace(/ō/g, 'ou'));
-                    if(cleanInput === target1 || cleanInput === target2 || cleanInput === target3) correct = true;
+                    const cleanInput = normalize(rawInput);
+                    
+                    // Create variants from Romaji (Handling long vowels)
+                    const r = item.romaji;
+                    const variants = [
+                        normalize(r.normalize("NFD").replace(/[\u0300-\u036f]/g, "")), // ā -> a
+                        normalize(r.replace(/ā/g, 'aa').replace(/ō/g, 'oo').replace(/ū/g, 'uu')), // ā -> aa
+                        normalize(r.replace(/ō/g, 'ou')), // ō -> ou
+                    ];
+                    
+                    // Also check parens logic for Romaji e.g. (o)namae -> namae, onamae
+                    // Since my tokenizer handles strings, let's use it on romaji too
+                    const possibleRomajis = getPossibleAnswers(item.romaji);
+                    possibleRomajis.forEach(pr => {
+                        variants.push(normalize(pr));
+                        variants.push(normalize(pr.replace(/ā/g, 'aa')));
+                    });
+
+                    if (variants.some(v => v === cleanInput)) correct = true;
                 } else {
-                    const cleanInput = input.replace(/\s+/g, '');
-                    const cleanTarget = item.japanese.replace(/[（）()]/g, '');
-                    if(cleanInput === cleanTarget || cleanInput === item.japanese) correct = true;
+                    // KANA Input
+                    const cleanInput = rawInput.replace(/\s+/g, '');
+                    const possibleKanas = getPossibleAnswers(item.japanese);
+                    // Compare trimmed input against possible answers (e.g. input "くに" vs db "(お)くに" -> "くに")
+                    if (possibleKanas.some(pk => pk.replace(/\s+/g,'') === cleanInput)) correct = true;
                 }
             } else {
-                const cleanInput = input.toLowerCase().trim();
-                const meaningParts = item.vietnamese.toLowerCase().split(/[\/(),]+/).map(s => s.trim()).filter(s => s.length > 0);
-                if (meaningParts.includes(cleanInput)) correct = true;
-                if (item.vietnamese.toLowerCase() === cleanInput) correct = true;
+                // JA -> VI (Meaning Check)
+                const possibleVietnamese = getPossibleAnswers(item.vietnamese);
+                const inputLower = rawInput.toLowerCase();
+                const inputNoTone = removeVietnameseTones(inputLower);
+                
+                // Check 1: Exact match with flexible dictionary
+                if (possibleVietnamese.includes(inputLower)) correct = true;
+                
+                // Check 2: Tone-less match (Optimized for lazy typing)
+                if (!correct) {
+                     const possibleNoTone = possibleVietnamese.map(v => removeVietnameseTones(v));
+                     if (possibleNoTone.includes(inputNoTone)) correct = true;
+                }
             }
 
             const feedback = document.getElementById('write-feedback');
