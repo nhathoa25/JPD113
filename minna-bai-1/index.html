@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Học Tiếng Nhật cùng Rem - Bài 1 (Chuẩn PDF)</title>
+    <title>Học Tiếng Nhật cùng Rem - Bài 1 (V13 - Aaron Control)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -15,24 +15,6 @@
             background-image: radial-gradient(#dbeafe 1px, transparent 1px);
             background-size: 20px 20px;
             overscroll-behavior-y: contain; 
-        }
-
-        /* RUBY (FURIGANA) STYLING */
-        ruby {
-            ruby-position: over;
-            display: inline-flex;
-            flex-direction: column-reverse;
-            align-items: center;
-            vertical-align: bottom;
-            line-height: 1.5;
-        }
-        rt {
-            font-size: 0.6em;
-            color: #64748b;
-            font-weight: normal;
-            line-height: 1;
-            margin-bottom: 0px;
-            user-select: none;
         }
 
         /* 3D Flip Animation */
@@ -405,7 +387,7 @@
                     <div class="mb-8">
                         <p class="text-xs text-blue-400 font-extrabold tracking-widest uppercase mb-3" id="write-label">Dịch sang tiếng Nhật</p>
                         <h3 class="text-3xl md:text-4xl font-black text-slate-800" id="write-question">...</h3>
-                        <div id="write-hint" class="h-10 mt-3 text-blue-500 font-bold opacity-0 transition-opacity flex items-center justify-center text-xl">...</div>
+                        <div id="write-hint" class="h-6 mt-3 text-blue-500 font-bold opacity-0 transition-opacity">...</div>
                     </div>
 
                     <div class="relative group input-focus-ring rounded-2xl mb-4">
@@ -471,87 +453,67 @@
 
     <!-- JS LOGIC -->
     <script>
-        // --- DATA (UPDATED BASED ON PDF CONTENT) ---
+        // --- DATA ---
         const vocabularyData = [
-            { id: 1, japanese: 'わたし', reading: 'わたし', romaji: 'watashi', vietnamese: 'Tôi' },
-            { id: 2, japanese: '（お）なまえ', reading: '（お）なまえ', romaji: '(o)namae', vietnamese: 'Tên' },
-            { id: 3, japanese: '（お）くに', reading: '（お）くに', romaji: '(o)kuni', vietnamese: 'Đất nước' },
-            { id: 4, japanese: 'にほん', reading: 'にほん', romaji: 'nihon', vietnamese: 'Nhật Bản' },
-            { id: 5, japanese: 'アメリカ', reading: 'アメリカ', romaji: 'amerika', vietnamese: 'Mỹ' },
-            { id: 6, japanese: 'イタリア', reading: 'イタリア', romaji: 'itaria', vietnamese: 'Ý' },
-            { id: 7, japanese: 'オーストラリア', reading: 'オーストラリア', romaji: 'ōsutoraria', vietnamese: 'Úc' },
-            { id: 8, japanese: 'かんこく', reading: 'かんこく', romaji: 'kankoku', vietnamese: 'Hàn Quốc' },
-            { id: 9, japanese: 'タイ', reading: 'タイ', romaji: 'tai', vietnamese: 'Thái Lan' },
-            { id: 10, japanese: 'ちゅうごく', reading: 'ちゅうごく', romaji: 'chūgoku', vietnamese: 'Trung Quốc' },
-            { id: 11, japanese: 'ロシア', reading: 'ロシア', romaji: 'roshia', vietnamese: 'Nga' },
-            { id: 12, japanese: 'こうこう', reading: 'こうこう', romaji: 'kōkō', vietnamese: 'Trường THPT' },
-            { id: 13, japanese: 'だいがく', reading: 'だいがく', romaji: 'daigaku', vietnamese: 'Đại học' },
-            { id: 14, japanese: 'にほんご', reading: 'にほんご', romaji: 'nihongo', vietnamese: 'Tiếng Nhật' },
-            { id: 15, japanese: '（お）しごと', reading: '（お）しごと', romaji: '(o)shigoto', vietnamese: 'Công việc' },
-            { id: 16, japanese: 'がくせい', reading: 'がくせい', romaji: 'gakusei', vietnamese: 'Học sinh' },
-            { id: 17, japanese: 'せんせい', reading: 'せんせい', romaji: 'sensei', vietnamese: 'Giáo viên' },
-            { id: 18, japanese: 'きょうし', reading: 'きょうし', romaji: 'kyōshi', vietnamese: 'Giáo viên (nghề nghiệp)' },
-            { id: 19, japanese: 'かいしゃいん', reading: 'かいしゃいん', romaji: 'kaishain', vietnamese: 'Nhân viên công ty' },
-            { id: 20, japanese: 'しゃいん', reading: 'しゃいん', romaji: 'shain', vietnamese: 'Nhân viên (của công ty...)' },
-            { id: 21, japanese: '～さん', reading: '～さん', romaji: '~san', vietnamese: 'Anh/chị ~' },
-            { id: 22, japanese: '～じん', reading: '～じん', romaji: '~jin', vietnamese: 'Người ~' },
-            { id: 23, japanese: 'どちら', reading: 'どちら', romaji: 'dochira', vietnamese: 'Đâu, nước nào' },
-            { id: 24, japanese: 'お<ruby>国<rt>くに</rt></ruby>はどちらですか。', reading: 'おくにはどちらですか', romaji: 'okuni wa dochira desu ka', vietnamese: 'Bạn là người nước nào?' },
-            { id: 25, japanese: 'はじめまして', reading: 'はじめまして', romaji: 'hajimemashite', vietnamese: 'Rất hân hạnh' },
-            { id: 26, japanese: '（どうぞ）よろしくお<ruby>願<rt>ねが</rt></ruby>いします。', reading: '（どうぞ）よろしくおねがいします', romaji: '(dōzo) yoroshiku onegaishimasu', vietnamese: 'Mong được giúp đỡ' },
-            { id: 27, japanese: 'こちらこそ', reading: 'こちらこそ', romaji: 'kochira koso', vietnamese: 'Chính tôi cũng vậy' },
-            { id: 28, japanese: 'あのう', reading: 'あのう', romaji: 'anō', vietnamese: 'À...' },
-            { id: 29, japanese: 'すみません', reading: 'すみません', romaji: 'sumimasen', vietnamese: 'Xin lỗi' },
-            { id: 30, japanese: 'あのう、すみません。', reading: 'あのう、すみません', romaji: 'anō, sumimasen', vietnamese: 'À, xin lỗi.' },
-            { id: 31, japanese: 'そうですか', reading: 'そうですか', romaji: 'sō desu ka', vietnamese: 'Thế à' },
-            { id: 32, japanese: 'はい', reading: 'はい', romaji: 'hai', vietnamese: 'Vâng' },
-            { id: 33, japanese: 'いいえ', reading: 'いいえ', romaji: 'iie', vietnamese: 'Không' },
-            { id: 34, japanese: 'たんじょうび', reading: 'たんじょうび', romaji: 'tanjōbi', vietnamese: 'Sinh nhật' },
-            { id: 35, japanese: 'ブラジル', reading: 'ブラジル', romaji: 'burajiru', vietnamese: 'Brazil' },
-            { id: 36, japanese: '～がつ', reading: '～がつ', romaji: '~gatsu', vietnamese: 'Tháng ~' },
-            { id: 37, japanese: '～にち', reading: '～にち', romaji: '~nichi', vietnamese: 'Ngày ~' },
-            { id: 38, japanese: '～さい', reading: '～さい', romaji: '~sai', vietnamese: '~ tuổi' },
-            { id: 39, japanese: 'いつ', reading: 'いつ', romaji: 'itsu', vietnamese: 'Khi nào' },
-            { id: 40, japanese: 'しゅみ', reading: 'しゅみ', romaji: 'shumi', vietnamese: 'Sở thích' },
-            { id: 41, japanese: 'スポーツ', reading: 'スポーツ', romaji: 'supōtsu', vietnamese: 'Thể thao' },
-            { id: 42, japanese: 'テニス', reading: 'テニス', romaji: 'tenisu', vietnamese: 'Tennis' },
-            { id: 43, japanese: 'すいえい', reading: 'すいえい', romaji: 'suiei', vietnamese: 'Bơi lội' },
-            { id: 44, japanese: 'えいが', reading: 'えいが', romaji: 'eiga', vietnamese: 'Phim' },
-            { id: 45, japanese: 'おんがく', reading: 'おんがく', romaji: 'ongaku', vietnamese: 'Âm nhạc' },
-            { id: 46, japanese: 'どくしょ', reading: 'どくしょ', romaji: 'dokusho', vietnamese: 'Đọc sách' },
-            { id: 47, japanese: 'りょこう', reading: 'りょこう', romaji: 'ryokō', vietnamese: 'Du lịch' },
-            { id: 48, japanese: 'りょうり', reading: 'りょうり', romaji: 'ryōri', vietnamese: 'Nấu ăn' },
-            { id: 49, japanese: '<ruby>私<rt>わたし</rt></ruby>の<ruby>趣味<rt>しゅみ</rt></ruby>は<ruby>料理<rt>りょうり</rt></ruby>です。', reading: 'わたしのしゅみはりょうりです', romaji: 'watashi no shumi wa ryōri desu', vietnamese: 'Sở thích của tôi là nấu ăn.' },
-            { id: 50, japanese: 'なん／なに', reading: 'なん／なに', romaji: 'nan / nani', vietnamese: 'Cái gì' },
-            { id: 51, japanese: 'あ（っ）', reading: 'あ（っ）', romaji: 'a (ttsu)', vietnamese: 'A!' },
-            { id: 52, japanese: 'わあ', reading: 'わあ', romaji: 'wā', vietnamese: 'Ôi / Wow' },
-            { id: 53, japanese: 'おなじですね', reading: 'おなじですね', romaji: 'onaji desu ne', vietnamese: 'Giống nhau nhỉ.' },
-            { id: 54, japanese: 'ありがとう。', reading: 'ありがとう', romaji: 'arigatō', vietnamese: 'Cảm ơn.' }
+          { id: 1, japanese: 'わたし', romaji: 'watashi', vietnamese: 'tôi' },
+          { id: 2, japanese: '（お）なまえ', romaji: '(o)namae', vietnamese: 'tên (lịch sự)' },
+          { id: 3, japanese: '（お）くに', romaji: '(o)kuni', vietnamese: 'đất nước' },
+          { id: 4, japanese: 'にほん', romaji: 'nihon', vietnamese: 'Nhật Bản' },
+          { id: 5, japanese: 'アメリカ', romaji: 'amerika', vietnamese: 'Mỹ' },
+          { id: 6, japanese: 'イタリア', romaji: 'itaria', vietnamese: 'Ý' },
+          { id: 7, japanese: 'オーストラリア', romaji: 'ōsutoraria', vietnamese: 'Úc' },
+          { id: 8, japanese: 'かんこく', romaji: 'kankoku', vietnamese: 'Hàn Quốc' },
+          { id: 9, japanese: 'タイ', romaji: 'tai', vietnamese: 'Thái Lan' },
+          { id: 10, japanese: 'ちゅうごく', romaji: 'chūgoku', vietnamese: 'Trung Quốc' },
+          { id: 11, japanese: 'ロシア', romaji: 'roshia', vietnamese: 'Nga' },
+          { id: 12, japanese: 'こうこう', romaji: 'kōkō', vietnamese: 'trường THPT' },
+          { id: 13, japanese: 'だいがく', romaji: 'daigaku', vietnamese: 'đại học' },
+          { id: 14, japanese: 'にほんご がっこう', romaji: 'nihongo gakkō', vietnamese: 'trường tiếng Nhật' },
+          { id: 15, japanese: '（お）しごと', romaji: '(o)shigoto', vietnamese: 'công việc' },
+          { id: 16, japanese: 'がくせい', romaji: 'gakusei', vietnamese: 'học sinh / sinh viên' },
+          { id: 17, japanese: 'せんせい', romaji: 'sensei', vietnamese: 'giáo viên (kính trọng)' },
+          { id: 18, japanese: 'きょうし', romaji: 'kyōshi', vietnamese: 'giáo viên (chức danh)' },
+          { id: 19, japanese: 'かいしゃいん', romaji: 'kaishain', vietnamese: 'nhân viên công ty' },
+          { id: 20, japanese: 'しゃいん', romaji: 'shain', vietnamese: 'nhân viên (~ công ty)' },
+          { id: 21, japanese: '～さん', romaji: '~san', vietnamese: 'anh/chị/ông/bà' },
+          { id: 22, japanese: '～じん', romaji: '~jin', vietnamese: 'người (quốc tịch)' },
+          { id: 23, japanese: 'どちら', romaji: 'dochira', vietnamese: 'đâu / nước nào' },
+          { id: 24, japanese: 'お国はどちらですか', romaji: 'okuni wa dochira desu ka', vietnamese: 'Bạn người nước nào?' },
+          { id: 25, japanese: 'はじめまして', romaji: 'hajimemashite', vietnamese: 'Rất hân hạnh' },
+          { id: 26, japanese: 'よろしくお願いします', romaji: 'yoroshiku onegaishimasu', vietnamese: 'Mong được giúp đỡ' },
+          { id: 27, japanese: 'こちらこそ', romaji: 'kochira koso', vietnamese: 'Chính tôi mới mong giúp' },
+          { id: 28, japanese: 'あのう', romaji: 'anō', vietnamese: 'à... (từ đệm)' },
+          { id: 29, japanese: 'すみません', romaji: 'sumimasen', vietnamese: 'xin lỗi' },
+          { id: 30, japanese: 'そうですか', romaji: 'sō desu ka', vietnamese: 'vậy à / thế à' },
+          { id: 31, japanese: 'はい', romaji: 'hai', vietnamese: 'vâng / đúng' },
+          { id: 32, japanese: 'いいえ', romaji: 'iie', vietnamese: 'không' },
+          { id: 33, japanese: 'たんじょうび', romaji: 'tanjōbi', vietnamese: 'sinh nhật' },
+          { id: 34, japanese: 'ブラジル', romaji: 'burajiru', vietnamese: 'Brazil' },
+          { id: 35, japanese: '～がつ', romaji: '~gatsu', vietnamese: 'tháng ~' },
+          { id: 36, japanese: '～にち', romaji: '~nichi', vietnamese: 'ngày ~' },
+          { id: 37, japanese: '～さい', romaji: '~sai', vietnamese: '~ tuổi' },
+          { id: 38, japanese: 'いつ', romaji: 'itsu', vietnamese: 'khi nào' },
+          { id: 39, japanese: 'しゅみ', romaji: 'shumi', vietnamese: 'sở thích' },
+          { id: 40, japanese: 'スポーツ', romaji: 'supōtsu', vietnamese: 'thể thao' },
+          { id: 41, japanese: 'テニス', romaji: 'tenisu', vietnamese: 'quần vợt' },
+          { id: 42, japanese: 'すいえい', romaji: 'suiei', vietnamese: 'bơi lội' },
+          { id: 43, japanese: 'えいが', romaji: 'eiga', vietnamese: 'phim' },
+          { id: 44, japanese: 'おんがく', romaji: 'ongaku', vietnamese: 'âm nhạc' },
+          { id: 45, japanese: 'どくしょ', romaji: 'dokusho', vietnamese: 'đọc sách' },
+          { id: 46, japanese: 'りょこう', romaji: 'ryokō', vietnamese: 'du lịch' },
+          { id: 47, japanese: 'りょうり', romaji: 'ryōri', vietnamese: 'nấu ăn' },
+          { id: 48, japanese: '私の趣味は料理です', romaji: 'watashi no shumi wa ryōri desu', vietnamese: 'Sở thích tôi là nấu ăn' },
+          { id: 49, japanese: 'なん／なに', romaji: 'nan / nani', vietnamese: 'cái gì' },
+          { id: 50, japanese: 'あ（っ）', romaji: 'a', vietnamese: 'à (ngạc nhiên)' },
+          { id: 51, japanese: 'わあ', romaji: 'wā', vietnamese: 'ôi / wow' },
+          { id: 52, japanese: 'おなじですね', romaji: 'onaji desu ne', vietnamese: 'giống nhau nhỉ' }
         ];
 
         // --- GLOBAL UTILS ---
-        function getCleanText(html) {
-            // Helper to get pure Kanji/Text from Ruby HTML for checking alternative answers
-            if(!html) return "";
-            if(!html.includes('<ruby>')) return html;
-            const tmp = document.createElement("div");
-            tmp.innerHTML = html;
-            const rts = tmp.querySelectorAll("rt");
-            rts.forEach(rt => rt.remove());
-            return tmp.textContent;
-        }
-
         function playAudio(text) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                // Strip ruby tags for reading if passed raw html, though we prefer passing .reading
-                let cleanText = text;
-                if(text.includes('<ruby>')) {
-                    // If HTML, prefer reading, but if not available, try to guess
-                    // Here we just assume 'text' passed is simple enough or use regex to remove HTML tags
-                    // But actually we are passing .reading now, so this is just fallback
-                    cleanText = text.replace(/<[^>]*>/g, '');
-                }
+                const cleanText = text.replace(/[（）()]/g, '').replace(/～/g, '');
                 const utterance = new SpeechSynthesisUtterance(cleanText);
                 utterance.lang = 'ja-JP';
                 utterance.rate = 1.0; 
@@ -875,7 +837,7 @@
         function renderFlashcard() {
             const item = fcList[fcIndex];
             document.getElementById('fc-counter').innerText = `${fcIndex + 1} / ${fcList.length}`;
-            document.getElementById('fc-japanese').innerHTML = item.japanese; // Use innerHTML for ruby
+            document.getElementById('fc-japanese').innerText = item.japanese;
             document.getElementById('fc-romaji').innerText = item.romaji;
             document.getElementById('fc-vietnamese').innerText = item.vietnamese;
             document.getElementById('card-inner').classList.remove('rotate-y-180');
@@ -912,7 +874,7 @@
         }
         function playAudioFromCard(e) {
             e.stopPropagation();
-            playAudio(fcList[fcIndex].reading);
+            playAudio(fcList[fcIndex].japanese);
         }
 
         // --- QUIZ LOGIC ---
@@ -948,7 +910,7 @@
             const audioBtn = document.getElementById('quiz-audio-btn');
 
             if (isQuestionJa) {
-                qMain.innerHTML = item.japanese; // HTML for Ruby
+                qMain.innerText = item.japanese;
                 qSub.innerText = item.romaji;
                 qSub.classList.remove('hidden');
                 audioBtn.classList.remove('hidden');
@@ -968,7 +930,7 @@
             options.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = "w-full p-4 text-left bg-white border-2 border-slate-100 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all font-medium text-slate-700 flex items-center shadow-sm";
-                const optText = isQuestionJa ? opt.vietnamese : opt.japanese; // HTML if Japanese
+                const optText = isQuestionJa ? opt.vietnamese : opt.japanese;
                 btn.innerHTML = `<span class="flex-grow">${optText}</span>`;
                 btn.onclick = () => checkQuiz(btn, opt.id === item.id);
                 container.appendChild(btn);
@@ -983,7 +945,7 @@
                 btn.classList.add('bg-green-50', 'border-green-500', 'text-green-700');
                 btn.innerHTML += `<i class="fas fa-check-circle text-green-600 text-xl ml-2"></i>`;
                 quizScore++;
-                playAudio(currentQuizItem.reading);
+                playAudio(currentQuizItem.japanese);
                 speakRem('correct');
             } else {
                 btn.classList.remove('border-slate-100', 'text-slate-700');
@@ -994,7 +956,7 @@
                 let isQuestionJa = (document.getElementById('quiz-question-sub').classList.contains('hidden')) === false; 
                 const correctText = isQuestionJa ? currentQuizItem.vietnamese : currentQuizItem.japanese;
                 for(let b of btns) {
-                    if(b.innerHTML.includes(correctText)) {
+                    if(b.innerText.includes(correctText)) {
                         b.classList.add('bg-green-50', 'border-green-300', 'text-green-700');
                     }
                 }
@@ -1012,7 +974,7 @@
             speakRem('finish');
         }
         function playAudioCurrentQuiz() {
-            if(currentQuizItem) playAudio(currentQuizItem.reading);
+            if(currentQuizItem) playAudio(currentQuizItem.japanese);
         }
 
         // --- WRITE LOGIC ---
@@ -1060,19 +1022,13 @@
             if (targetIsJa) {
                 label.innerText = "Dịch sang Tiếng Nhật";
                 question.innerText = item.vietnamese;
-                // BUG FIX: Show full HTML Ruby as hint if Romaji mode (so user knows which word), or simple reading if Japanese mode
-                if(writeInputType === 'romaji') {
-                    hint.innerHTML = item.japanese; 
-                } else {
-                    hint.innerHTML = item.reading;
-                }
-                
+                hint.innerText = writeInputType === 'romaji' ? item.japanese : item.romaji;
                 tip.classList.remove('hidden');
                 inputTypeSelector.classList.remove('hidden');
                 input.placeholder = writeInputType === 'romaji' ? "Nhập Romaji (vd: watashi)" : "Nhập Kana/Kanji";
             } else {
                 label.innerText = "Dịch sang Tiếng Việt";
-                question.innerHTML = item.japanese; 
+                question.innerText = item.japanese; 
                 hint.innerText = item.vietnamese;
                 tip.classList.add('hidden');
                 inputTypeSelector.classList.add('hidden');
@@ -1116,11 +1072,8 @@
                     if(cleanInput === target1 || cleanInput === target2 || cleanInput === target3) correct = true;
                 } else {
                     const cleanInput = input.replace(/\s+/g, '');
-                    const cleanTargetReading = item.reading.replace(/[（）()]/g, '');
-                    // BUG FIX: Use getCleanText helper to strip ruby tags for comparison
-                    const cleanTargetKanji = getCleanText(item.japanese).replace(/[（）()]/g, '');
-                    
-                    if(cleanInput === cleanTargetReading || cleanInput === cleanTargetKanji) correct = true;
+                    const cleanTarget = item.japanese.replace(/[（）()]/g, '');
+                    if(cleanInput === cleanTarget || cleanInput === item.japanese) correct = true;
                 }
             } else {
                 const cleanInput = input.toLowerCase().trim();
@@ -1137,7 +1090,7 @@
                 const answerText = targetIsJa ? item.japanese : item.vietnamese;
                 feedback.innerHTML = `<div class="text-green-600 font-bold bg-green-50 px-4 py-2 rounded-xl flex items-center justify-center gap-2 animate-bounce w-full border border-green-100 shadow-sm"><i class="fas fa-check-circle"></i> Chính xác! ${answerText}</div>`;
                 inp.classList.add('border-green-400', 'bg-green-50');
-                if (targetIsJa) playAudio(item.reading);
+                if (targetIsJa) playAudio(item.japanese);
                 speakRem('correct');
             } else {
                 const answerText = targetIsJa ? `${item.japanese} (${item.romaji})` : item.vietnamese;
@@ -1174,33 +1127,23 @@
 
             const subset = shuffleArray([...vocabularyData]).slice(0, 8);
             subset.forEach((item, idx) => {
-                // For Japanese side, show HTML (Kanji+Furigana). 
-                // We need to store reading for audio.
-                matchCards.push({ id: idx, type: 'ja', text: item.japanese, reading: item.reading, ref: item });
-                matchCards.push({ id: idx, type: 'vi', text: item.vietnamese, reading: null, ref: item });
+                matchCards.push({ id: idx, type: 'ja', text: item.japanese, ref: item });
+                matchCards.push({ id: idx, type: 'vi', text: item.vietnamese, ref: item });
             });
             matchCards = shuffleArray(matchCards);
 
             matchCards.forEach((card, domIdx) => {
                 const el = document.createElement('div');
                 el.className = "match-card bg-white rounded-xl shadow-sm border-2 border-slate-100 flex items-center justify-center p-2 text-center text-sm md:text-base font-bold text-slate-700 h-24 hover:border-blue-300 hover:shadow-md active:bg-blue-50";
-                
-                // Allow HTML rendering for Ruby
-                if(card.type === 'ja') {
-                     el.innerHTML = card.text;
-                } else {
-                     el.innerText = card.text;
-                }
-
                 if(card.text.length > 20) el.classList.add('text-xs');
-                
+                el.innerText = card.text;
                 el.onclick = () => handleMatchClick(el, card);
                 grid.appendChild(el);
             });
         }
         function handleMatchClick(el, card) {
             if(el.classList.contains('matched') || el.classList.contains('selected') || selectedCards.length >= 2) return;
-            if(card.type === 'ja') playAudio(card.reading);
+            if(card.type === 'ja') playAudio(card.text);
 
             el.classList.add('selected');
             selectedCards.push({ el, card });
@@ -1239,9 +1182,9 @@
                 tr.className = "hover:bg-blue-50 transition-colors group";
                 tr.innerHTML = `
                     <td class="p-4 border-b border-slate-100 font-mono text-blue-500 font-bold group-hover:text-blue-600">${item.romaji}</td>
-                    <td class="p-4 border-b border-slate-100 font-black text-slate-700 flex items-center gap-2 text-lg">
+                    <td class="p-4 border-b border-slate-100 font-black text-slate-700 flex items-center gap-2">
                         ${item.japanese}
-                        <button onclick="playAudio('${item.reading}')" class="w-7 h-7 rounded-full bg-slate-50 text-slate-400 hover:bg-blue-500 hover:text-white transition-all flex items-center justify-center text-xs opacity-0 group-hover:opacity-100">
+                        <button onclick="playAudio('${item.japanese}')" class="w-7 h-7 rounded-full bg-slate-50 text-slate-400 hover:bg-blue-500 hover:text-white transition-all flex items-center justify-center text-xs opacity-0 group-hover:opacity-100">
                             <i class="fas fa-volume-up"></i>
                         </button>
                     </td>
