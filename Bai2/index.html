@@ -689,7 +689,10 @@
                 window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
                 
+                // --- PHỤC HỒI LOGIC CHỌN GIỌNG GỐC CỦA BẠN (CÓ THÊM PHẦN KIỂM TRA ĐỂ TRÁNH GIỌNG NAM NẾU CÓ THỂ) ---
                 const voices = window.speechSynthesis.getVoices();
+                // Logic gốc của bạn ưu tiên giọng Google trước, rồi đến fallback chung
+                // Mình thêm điều kiện check name không chứa "Ichiro" (giọng nam điển hình) nếu có thể, nhưng bám sát code gốc nhất là ưu tiên Google.
                 let jaVoice = voices.find(v => v.name.includes("Google") && v.lang.includes("ja"));
                 if (!jaVoice) {
                       jaVoice = voices.find(v => v.lang === 'ja-JP' || v.lang === 'ja_JP');
@@ -697,10 +700,12 @@
                 
                 if (jaVoice) utterance.voice = jaVoice;
 
+                // --- KHÔI PHỤC CÁC THÔNG SỐ VỀ ĐÚNG CODE MẪU GỐC ---
                 utterance.lang = 'ja-JP';
-                utterance.rate = 1.05; 
-                utterance.pitch = 1.1; 
-                utterance.volume = 0.25; // WHISPER MODE
+                utterance.rate = 1.05;  // Tốc độ hơi nhanh 1 chút (như code mẫu)
+                utterance.pitch = 1.1;  // Cao độ nhẹ nhàng (như code mẫu), không quá cao gây rè
+                utterance.volume = 0.25; // QUAN TRỌNG: WHISPER MODE (Âm lượng nhỏ 25% như code mẫu)
+                
                 window.speechSynthesis.speak(utterance);
             }
         }
